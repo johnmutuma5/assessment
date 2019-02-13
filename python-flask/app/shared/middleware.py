@@ -6,7 +6,6 @@ from .. import app
 APP_SECRET = app.config['APP_SECRET']
 
 def admin_only (func):
-
     @wraps(func)
     def wrapper (*args, **kwargs):
         token = request.headers['token']
@@ -18,12 +17,10 @@ def admin_only (func):
                 'message': 'Please provide admin credentials'
             }), 403
         return func(*args, **kwargs)
-
     return wrapper
 
 
 def require_token (func):
-
     @wraps(func)
     def wrapper (*args, **kwargs):
         try:
@@ -35,5 +32,4 @@ def require_token (func):
                 'message': 'Please provide a valid token in request headers'
             }), 403
         return func(*args, **kwargs)
-
     return wrapper

@@ -1,7 +1,9 @@
 import json
 from flask import jsonify, request
+from sqlalchemy.exc import IntegrityError
 from ..store import store
 from ..shared.middleware import admin_only, require_token
+from ..product.models import Product
 
 class ProductController:
 
@@ -9,16 +11,22 @@ class ProductController:
     @require_token
     @admin_only
     def add_product ():
-        product_data = json.loads(request.data)
-        product = store.add_product(product_data)
+        raw_data = json.loads(request.data)
+        product = Product(raw_data)
+        # add product to the database
+        try:
+            new_product = store.add_product(product)
+        except IntegrityError as e:
+            return jsonify({ 'ok': False, 'message': 'Product already exists' }), 409
         return jsonify({
-            'product': product,
+            'product': new_product.serialize(),
             'ok': True
         })
 
     def view_products ():
-        products = store.get_all_products()
+        products_data = store.get_all_products()
+        products = map(lambda prod: prod.serialize(), products_data)
         return jsonify({
-            'products': products,
+            'products': list(products),
             'ok': True
         })

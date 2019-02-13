@@ -1,5 +1,5 @@
 venv:
-	virtualenv -p python3.6 venv
+	virtualenv -p python3.7 venv
 
 install:
 	pip install -r requirements.txt
@@ -9,3 +9,6 @@ freeze:
 
 run:
 	python run.py
+
+tables:
+	python seeds.py

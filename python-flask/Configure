@@ -7,4 +7,5 @@ source ./venv/bin/activate
 source ./LocalConfig
 make install
 make freeze
+make tables
 make run

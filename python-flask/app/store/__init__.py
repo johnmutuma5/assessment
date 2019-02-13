@@ -1,9 +1,26 @@
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker, scoped_session
+from .base import Base
+from .product_manager import ProductManager
+from .user_manager import UserManager
+from .. import app
 from ..shared.exceptions import AuthenticationError
+from ..shared.utils import hash_password
+
+SQLALCHEMY_DATABASE_URI = app.config['SQLALCHEMY_DATABASE_URI']
 
 class Store():
     def __init__(self):
-        self.userManager = UserManager()
-        self.productManager = ProductManager()
+        self.dbEngine = create_engine(SQLALCHEMY_DATABASE_URI)
+        self.Session = scoped_session(sessionmaker(bind=self.dbEngine))
+        self.userManager = UserManager(self.Session)
+        self.productManager = ProductManager(self.Session)
+
+    def init_db (self):
+        Base.metadata.create_all(bind=self.dbEngine)
+
+    def drop_db (self):
+        Base.metadata.drop_all(bind=self.dbEngine)
 
     def add_user(self, user_data):
         return self.userManager.add_user(user_data)
@@ -16,47 +33,5 @@ class Store():
 
     def get_all_products(self):
         return self.productManager.get_all_products()
-
-
-class UserManager ():
-    def __init__(self):
-        self.users = {
-            'admin': {
-            'username': 'admin',
-            'password': 'admin_pass',
-            'role': 'admin'
-            }
-        }
-    def add_user(self, user_data):
-        username = user_data['username']
-        self.users[username] = user_data
-        return self.users[username]
-
-    def find_user(self, credentials):
-        username = credentials['username']
-        password = credentials['password']
-        authError = AuthenticationError('Invalid login credentials')
-
-        try:
-            user = self.users[username]
-        except KeyError as e:
-            raise authError
-
-        if not password == user['password']:
-            raise authError
-        return user
-
-
-
-class ProductManager ():
-    def add_product(self, product_data):
-        product_name = product_data['name'];
-        self.products[product_name] = product_data
-        return self.products[product_name]
-
-    def get_all_products(self):
-        return list(self.products.values())
-
-
 
 store = Store()
