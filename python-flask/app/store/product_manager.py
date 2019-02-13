@@ -20,4 +20,5 @@ class ProductManager ():
     def get_all_products(self):
         session = self.Session()
         products = session.query(Product).all()
+        session.close()
         return products

@@ -1,4 +1,5 @@
 from ..user.models import User
+from ..shared.utils import hash_password
 
 class UserManager ():
     def __init__(self, Session):

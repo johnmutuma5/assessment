@@ -21,7 +21,7 @@ class ProductController:
         return jsonify({
             'product': new_product.serialize(),
             'ok': True
-        })
+        }), 201
 
     def view_products ():
         products_data = store.get_all_products()

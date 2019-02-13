@@ -12,3 +12,6 @@ run:
 
 tables:
 	python seeds.py
+
+test:
+	nosetests --exe  --nocapture --with-coverage --cover-package=app
